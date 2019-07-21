@@ -3,6 +3,8 @@ function randInt(min,max) {
 }
 window.addEventListener("load", function() {
 
+
+	const socket = io();
 	const controller = new KeyboardController("w","a","s","d")
 	const world = new World();
 	world.generateMap(25,25);
@@ -30,6 +32,10 @@ window.addEventListener("load", function() {
 	const engine = new Engine(60,update,render);
 	resize();
 	engine.start();
+
+	socket.on('serve', function(data) {
+		console.log(data)
+	});
 
 
 	window.addEventListener("keydown", controller.updateKeys)
