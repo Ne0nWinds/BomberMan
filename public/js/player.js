@@ -5,9 +5,11 @@ const World = function() {
 	}
 
 	this.player = new Player("red");
+	this.other_players = { };
 	this.map = [];
 	this.spawn_points = [];
 	this.tile_size = 64;
+
 	this.generateMap = function (SizeX,SizeY) {
 		let i, j;
 		for (i = 0; i < SizeY; i++) {
