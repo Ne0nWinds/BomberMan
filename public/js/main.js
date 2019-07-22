@@ -4,7 +4,8 @@ function randInt(min,max) {
 window.addEventListener("load", function() {
 
 	const socket = io();
-	const controller = new KeyboardController("w","a","s","d")
+//	const controller = new KeyboardController("w","a","s","d")
+	const controller = new GamePadController();
 	const world = new World();
 	world.generateMap(25,25);
 	world.spawnPlayer();
@@ -15,8 +16,10 @@ window.addEventListener("load", function() {
 	}
 
 	const update = function() {
-		if (controller.up || controller.down || controller.right || controller.left) {
-			world.player.move(5,engine.time_delta,Math.atan2(controller.down - controller.up,controller.right - controller.left))
+		controller.update();
+
+		if (controller.enabled) {
+			world.player.move(5 * controller.mod,engine.time_delta,controller.angle)
 			world.update();
 			socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
 		}
