@@ -1,7 +1,7 @@
 const Display = function(canvas,contextWidth,contextHeight,bufferWidth,bufferHeight) {
 
-	this.context = canvas.getContext("2d")
-	this.buffer = document.createElement("canvas").getContext("2d")
+	this.context = canvas.getContext("2d", { alpha:false })
+	this.buffer = document.createElement("canvas").getContext("2d", { alpha:false })
 	this.buffer.canvas.width = bufferWidth;
 	this.buffer.canvas.height = bufferHeight;
 	this.context.canvas.width = contextWidth;
@@ -14,14 +14,19 @@ const Display = function(canvas,contextWidth,contextHeight,bufferWidth,bufferHei
 
     };
 
-	this.drawMap = function(map,mapKey,tile_size) {
+	this.drawMap = function(map,img,tile_size) {
 		let height = map.length;
 		let width = map[0].length;
 		let x, y;
 		
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < width; x++) {
-				this.drawRectangle(x*tile_size,y*tile_size,tile_size,tile_size,mapKey[map[y][x]])
+				if (!map[y][x]) {
+//					this.drawImage(img,x*tile_size,y*tile_size);
+					this.drawRectangle(x*tile_size,y*tile_size,tile_size,tile_size,"black")
+				} else {
+					this.drawRectangle(x*tile_size,y*tile_size,tile_size,tile_size,"white")
+				}
 			}
 		}
 
@@ -39,6 +44,7 @@ const Display = function(canvas,contextWidth,contextHeight,bufferWidth,bufferHei
 	};
 
     this.render = function(top=16,right=16,zoomLevel) {
+		this.context.clearRect(0,0,this.context.canvas.width,this.context.canvas.height)
 		this.context.drawImage(this.buffer.canvas,right*-1,top*-1,this.buffer.canvas.width * zoomLevel,this.buffer.canvas.height * zoomLevel)
     };
 

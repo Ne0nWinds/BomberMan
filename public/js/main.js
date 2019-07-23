@@ -15,7 +15,9 @@ window.addEventListener("load", function() {
 	world.generateMap(25,25);
 	world.spawnPlayer();
 	const display = new Display(document.querySelector("#canvas"),1280,720,world.map[0].length * world.tile_size,world.map.length * world.tile_size)
-	const imgs = [document.getElementById("c4")]
+	let c4 = document.createElement("canvas").getContext("2d")
+	c4.drawImage(document.getElementById("c4"),0,0)
+
 
 	const resize = function() {
 		display.resize(window.innerWidth,window.innerHeight,16,9);
@@ -23,6 +25,7 @@ window.addEventListener("load", function() {
 
 	const update = function() {
 //		controller.update();
+/*
 		for (let i in world.player.bombs) {
 			let b = world.player.bombs[i];
 			if (b.timeToDetonate > 0) {
@@ -32,8 +35,16 @@ window.addEventListener("load", function() {
 				delete world.player.bombs[i];
 			}
 		}
+		*/
+
 		if (controller.placeBomb) {
-			world.player.placeBomb(world.player.x + 18,world.player.y + 18,64)
+			if (world.player.placeBombActive) {
+				world.player.placeBomb(world.player.x + 18,world.player.y + 18,64)
+				socket.emit('add_bomb', {
+					id: world.player.bombID - 1,
+					bomb: world.player.bombs[world.player.bombID - 1],
+				})
+			}
 		} else {
 			world.player.placeBombActive = true;
 		}
@@ -45,12 +56,13 @@ window.addEventListener("load", function() {
 	}
 	
 	const render = function() {
-		display.drawMap(world.map,world.mapKey,world.tile_size);
+		display.drawMap(world.map,0,world.tile_size);
 
-		for (let i in world.player.bombs) {
-			let b = world.player.bombs[i];
-//			display.drawRectangle(b.x * world.tile_size + 14,b.y * world.tile_size + 14,36,36,b.color)
-			display.drawImage(imgs[0],b.x * world.tile_size + 14,b.y * world.tile_size + 14,0);
+		for (let i in world.bombs) {
+			for (let x in world.bombs[i]) {
+				let b = world.bombs[i][x]
+				display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14,0);
+			}
 		}
 
 		if (world.player.alive) {
@@ -74,6 +86,9 @@ window.addEventListener("load", function() {
 	window.addEventListener("resize", resize)
 	socket.on('update', function (data) {
 		world.other_players = data;
+	});
+	socket.on('update_bombs', function(data) {
+		world.bombs = data;
 	})
 });
 

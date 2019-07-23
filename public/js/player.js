@@ -6,6 +6,7 @@ const World = function() {
 
 	this.player = new Player("red");
 	this.other_players = { };
+	this.bombs = { };
 	this.map = [];
 	this.spawn_points = [];
 	this.tile_size = 64;
@@ -77,7 +78,7 @@ const Player = function(color,x=64,y=64) {
 	this.velocity_y = 0;
 	this.alive = false;
 	this.bombs = {};
-	let bombID = 0;
+	this.bombID = 0;
 	this.placeBombActive = false;
 
 	this.move = function(speed, mod, angle) {
@@ -86,17 +87,17 @@ const Player = function(color,x=64,y=64) {
 			this.old_y = this.y;
 			this.velocity_x = Math.cos(angle);
 			this.velocity_y = Math.sin(angle);
-			this.x += this.velocity_x * speed * 1/mod;
-			this.y += this.velocity_y * speed * 1/mod;
+			this.x += this.velocity_x * speed * mod;
+			this.y += this.velocity_y * speed * mod;
 		}
 	}
 
 	this.placeBomb = function(x,y,tile_size) {
-		if (this.placeBombActive && this.bombs[bombID - 3] == undefined) {
+		if (this.bombs[this.bombID - 3] == undefined) {
 			let bombX = Math.floor(x / tile_size);
 			let bombY = Math.floor(y / tile_size);
 			let bombValid = true;
-			for (let i = bombID - 3; i < bombID; i++) {
+			for (let i = this.bombID - 3; i < this.bombID; i++) {
 				if (this.bombs[i] != undefined) {
 					if (this.bombs[i].x == bombX && this.bombs[i].y == bombY) {
 						bombValid = false;
@@ -105,8 +106,8 @@ const Player = function(color,x=64,y=64) {
 				};
 			}
 			if (bombValid) {
-				this.bombs[bombID] = new Bomb(bombX,bombY);
-				bombID++;
+				this.bombs[this.bombID] = new Bomb(bombX,bombY);
+				this.bombID++;
 				this.placeBombActive = false;
 			}
 		}
@@ -114,9 +115,8 @@ const Player = function(color,x=64,y=64) {
 }
 
 const Bomb = function(x,y) {
-	this.color = genColor();
 	this.x = x;
 	this.y = y;
-	this.timeToDetonate = 180;
+	this.timeStamp = Date.now();
 	this.power = 3;
 }

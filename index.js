@@ -8,12 +8,16 @@ const io = require('socket.io')(server);
 app.use(express.static(__dirname + '/public'));
 
 let players = {};
+let bombs = {};
 io.on('connection', function (socket) {
 	
 	players[socket.id] = {
 		x: 0,
 		y: 0,
-		alive: false
+		alive: false,
+	}
+	bombs[socket.id] = {
+
 	}
 
 	socket.broadcast.emit('update', players)
@@ -25,9 +29,23 @@ io.on('connection', function (socket) {
 
 	socket.on('update_movement', function(data) {
 		players[socket.id] = data;
-		socket.broadcast.emit('update',players)
+	});
+
+	socket.on('add_bomb', function(data) {
+		bombs[socket.id][data.id] = data.bomb;
+		bombs[socket.id][data.id].timeSince = 0;
 	});
 
 })
 
+setInterval(() => {
+	let date = Date.now();
+	for (let p in bombs) {
+		for (let b in bombs[p]) {
+			bombs[p][b].timeSince = date - bombs[p][b].timeStamp
+		}
+	}
+	io.emit('update_bombs',bombs)
+	io.emit('update',players)
+}, 8)
 
