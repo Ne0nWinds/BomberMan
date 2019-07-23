@@ -1,10 +1,15 @@
 function randInt(min,max) {
 	return Math.floor(Math.random() * (max - min + 1) + min)
 }
+function genColor() {
+    let color = "#" + Math.floor((Math.random() * (16777216 - 363636)) + 363636).toString(16);
+    if (color.length != 7) {color = color.slice(0, 1) + "0" + color.slice(1, 6); }
+    return color;
+}
 window.addEventListener("load", function() {
 
 	const socket = io();
-	const controller = new KeyboardController("w","a","s","d")
+	const controller = new KeyboardController("w","a","s","d"," ")
 //	const controller = new GamePadController();
 	const world = new World();
 	world.generateMap(25,25);
@@ -17,6 +22,12 @@ window.addEventListener("load", function() {
 
 	const update = function() {
 //		controller.update();
+		if (controller.placeBomb) {
+			world.player.placeBomb(world.player.x,world.player.y,64)
+			console.log(world.player.bombs)
+		} else {
+			world.player.placeBombActive = true;
+		}
 		if (controller.enabled) {
 			world.player.move(5 * controller.mod,engine.time_delta,controller.angle)
 			world.update();

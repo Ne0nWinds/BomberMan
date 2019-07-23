@@ -51,7 +51,7 @@ const World = function() {
 		}
 	}
 
-	this.spawnPlayer = function(object) {
+	this.spawnPlayer = function() {
 		let currentSpawn = this.spawn_points[randInt(0,this.spawn_points.length - 1)];
 		this.player.x = currentSpawn.x * this.tile_size + ((this.tile_size - this.player.width)/2);
 		this.player.y = currentSpawn.y * this.tile_size + ((this.tile_size - this.player.height)/2);
@@ -76,6 +76,8 @@ const Player = function(color,x=64,y=64) {
 	this.velocity_x = 0;
 	this.velocity_y = 0;
 	this.alive = false;
+	this.bombs = [];
+	this.placeBombActive = false;
 
 	this.move = function(speed, mod, angle) {
 		if (this.alive) {
@@ -88,4 +90,20 @@ const Player = function(color,x=64,y=64) {
 		}
 	}
 
+	this.placeBomb = function(x,y,tile_size) {
+		if (this.placeBombActive && this.bombs.length < 3) {
+			let bombX = Math.floor(x / tile_size);
+			let bombY = Math.floor(y / tile_size);
+			this.bombs.push(new Bomb(bombX,bombY));
+			this.placeBombActive = false;
+		}
+	}
+}
+
+const Bomb = function(x,y) {
+	this.color = genColor();
+	this.x = x;
+	this.y = y;
+	this.timeToDetonate = 240;
+	this.power = 3;
 }

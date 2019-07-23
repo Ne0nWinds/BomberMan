@@ -1,9 +1,11 @@
-const KeyboardController = function(upBtn,leftBtn,downBtn,rightBtn) {
+const KeyboardController = function(upBtn,leftBtn,downBtn,rightBtn,placeBtn) {
 
 	this.up = this.down = this.left = this.right = false;
 
 	this.angle = 0;
 	this.mod = 1;
+	this.placeBomb = false;
+
 	this.enabled = false;
 	
 	this.update = (event) => {
@@ -12,6 +14,7 @@ const KeyboardController = function(upBtn,leftBtn,downBtn,rightBtn) {
 			case rightBtn: this.right = (event.type == "keydown"); break;
 			case upBtn: this.up = (event.type == "keydown"); break;
 			case downBtn: this.down = (event.type == "keydown"); break;
+			case placeBtn: this.placeBomb = (event.type == "keydown"); break;
 		}
 		this.angle = Math.atan2(this.down - this.up,this.right - this.left);
 		this.enabled = (this.up || this.down || this.left || this.right) ? true : false;
@@ -23,6 +26,8 @@ const GamePadController = function() {
 
 	this.angle = 0;
 	this.mod = 0;
+	this.placeBomb = false;
+
 	this.enabled = false;
 
 	this.update = () => {
