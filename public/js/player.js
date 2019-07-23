@@ -76,7 +76,8 @@ const Player = function(color,x=64,y=64) {
 	this.velocity_x = 0;
 	this.velocity_y = 0;
 	this.alive = false;
-	this.bombs = [];
+	this.bombs = {};
+	let bombID = 0;
 	this.placeBombActive = false;
 
 	this.move = function(speed, mod, angle) {
@@ -91,10 +92,11 @@ const Player = function(color,x=64,y=64) {
 	}
 
 	this.placeBomb = function(x,y,tile_size) {
-		if (this.placeBombActive && this.bombs.length < 3) {
+		if (this.placeBombActive && this.bombs[bombID - 3] == undefined) {
 			let bombX = Math.floor(x / tile_size);
 			let bombY = Math.floor(y / tile_size);
-			this.bombs.push(new Bomb(bombX,bombY));
+			this.bombs[bombID] = new Bomb(bombX,bombY);
+			bombID++;
 			this.placeBombActive = false;
 		}
 	}
@@ -104,6 +106,6 @@ const Bomb = function(x,y) {
 	this.color = genColor();
 	this.x = x;
 	this.y = y;
-	this.timeToDetonate = 240;
+	this.timeToDetonate = 180;
 	this.power = 3;
 }

@@ -22,8 +22,17 @@ window.addEventListener("load", function() {
 
 	const update = function() {
 //		controller.update();
+		for (let i in world.player.bombs) {
+			let b = world.player.bombs[i];
+			if (b.timeToDetonate > 0) {
+				b.timeToDetonate -= engine.time_delta;
+			}
+			if (b.timeToDetonate < 0) {
+				delete world.player.bombs[i];
+			}
+		}
 		if (controller.placeBomb) {
-			world.player.placeBomb(world.player.x,world.player.y,64)
+			world.player.placeBomb(world.player.x + 18,world.player.y + 18,64)
 			console.log(world.player.bombs)
 		} else {
 			world.player.placeBombActive = true;
@@ -37,14 +46,23 @@ window.addEventListener("load", function() {
 	
 	const render = function() {
 		display.drawMap(world.map,world.mapKey,world.tile_size);
+
+		for (let i in world.player.bombs) {
+			let b = world.player.bombs[i];
+			display.drawRectangle(b.x * world.tile_size + 14,b.y * world.tile_size + 14,36,36,b.color)
+		}
+
 		if (world.player.alive) {
 			display.drawRectangle(world.player.x,world.player.y,world.player.width,world.player.height,world.player.color);
 		}
+
 		for (let p in world.other_players) {
 			if (p != socket.id && world.other_players[p].alive) {
 				display.drawRectangle(world.other_players[p].x,world.other_players[p].y,world.player.width,world.player.height,world.player.color);
 			}
 		}
+
+
 		display.render(world.player.y - display.context.canvas.height / 2 + 18,world.player.x - display.context.canvas.width / 2 + 18,1);
 	}
 	const engine = new Engine(60,update,render);
