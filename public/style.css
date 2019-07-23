@@ -11,3 +11,6 @@ body {
 canvas {
 	background-color: black;
 }
+img {
+	display: none;
+}

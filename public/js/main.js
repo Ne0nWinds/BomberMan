@@ -15,6 +15,7 @@ window.addEventListener("load", function() {
 	world.generateMap(25,25);
 	world.spawnPlayer();
 	const display = new Display(document.querySelector("#canvas"),1280,720,world.map[0].length * world.tile_size,world.map.length * world.tile_size)
+	const imgs = [document.getElementById("c4")]
 
 	const resize = function() {
 		display.resize(window.innerWidth,window.innerHeight,16,9);
@@ -33,7 +34,6 @@ window.addEventListener("load", function() {
 		}
 		if (controller.placeBomb) {
 			world.player.placeBomb(world.player.x + 18,world.player.y + 18,64)
-			console.log(world.player.bombs)
 		} else {
 			world.player.placeBombActive = true;
 		}
@@ -49,7 +49,8 @@ window.addEventListener("load", function() {
 
 		for (let i in world.player.bombs) {
 			let b = world.player.bombs[i];
-			display.drawRectangle(b.x * world.tile_size + 14,b.y * world.tile_size + 14,36,36,b.color)
+//			display.drawRectangle(b.x * world.tile_size + 14,b.y * world.tile_size + 14,36,36,b.color)
+			display.drawImage(imgs[0],b.x * world.tile_size + 14,b.y * world.tile_size + 14,0);
 		}
 
 		if (world.player.alive) {
@@ -61,7 +62,6 @@ window.addEventListener("load", function() {
 				display.drawRectangle(world.other_players[p].x,world.other_players[p].y,world.player.width,world.player.height,world.player.color);
 			}
 		}
-
 
 		display.render(world.player.y - display.context.canvas.height / 2 + 18,world.player.x - display.context.canvas.width / 2 + 18,1);
 	}
