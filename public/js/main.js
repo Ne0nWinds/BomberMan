@@ -1,19 +1,18 @@
 function randInt(min,max) {
 	return Math.floor(Math.random() * (max - min + 1) + min)
 }
-function genColor() {
-    let color = "#" + Math.floor((Math.random() * (16777216 - 363636)) + 363636).toString(16);
-    if (color.length != 7) {color = color.slice(0, 1) + "0" + color.slice(1, 6); }
-    return color;
-}
 window.addEventListener("load", function() {
 
 	const socket = io();
+
 	const controller = new KeyboardController("w","a","s","d"," ")
 //	const controller = new GamePadController();
+
 	const world = new World();
 	world.generateMap(25,25);
 	world.spawnPlayer();
+	socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
+
 	const display = new Display(document.querySelector("#canvas"),1280,720,world.map[0].length * world.tile_size,world.map.length * world.tile_size)
 	let c4 = document.createElement("canvas").getContext("2d")
 	c4.drawImage(document.getElementById("c4"),0,0)
@@ -24,19 +23,6 @@ window.addEventListener("load", function() {
 	}
 
 	const update = function() {
-//		controller.update();
-/*
-		for (let i in world.player.bombs) {
-			let b = world.player.bombs[i];
-			if (b.timeToDetonate > 0) {
-				b.timeToDetonate -= engine.time_delta;
-			}
-			if (b.timeToDetonate < 0) {
-				delete world.player.bombs[i];
-			}
-		}
-		*/
-
 		if (controller.placeBomb) {
 			if (world.player.placeBombActive) {
 
