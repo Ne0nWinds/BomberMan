@@ -13,13 +13,13 @@ window.addEventListener("load", function() {
 	world.spawnPlayer();
 	socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
 
-	const display = new Display(document.querySelector("#canvas"),1280,720,world.map[0].length * world.tile_size,world.map.length * world.tile_size)
+	const display = new Display(document.querySelector("#canvas"),world.map[0].length * world.tile_size,world.map.length * world.tile_size)
 	let c4 = document.createElement("canvas").getContext("2d")
 	c4.drawImage(document.getElementById("c4"),0,0)
 
 
 	const resize = function() {
-		display.resize(window.innerWidth,window.innerHeight,16,9);
+		display.resize(window.innerWidth,window.innerHeight);
 	}
 
 	const update = function() {

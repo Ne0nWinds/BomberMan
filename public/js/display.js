@@ -1,11 +1,9 @@
-const Display = function(canvas,contextWidth,contextHeight,bufferWidth,bufferHeight) {
+const Display = function(canvas,bufferWidth,bufferHeight) {
 
 	this.context = canvas.getContext("2d", { alpha:false })
 	this.buffer = document.createElement("canvas").getContext("2d", { alpha:false })
 	this.buffer.canvas.width = bufferWidth;
 	this.buffer.canvas.height = bufferHeight;
-	this.context.canvas.width = contextWidth;
-	this.context.canvas.height = contextHeight;
 
 	this.fill = function(color) {
 
@@ -50,15 +48,17 @@ const Display = function(canvas,contextWidth,contextHeight,bufferWidth,bufferHei
 
 
 	this.resize = function(w,h,w_ratio,h_ratio) {
-		if (h/w > h_ratio/w_ratio) {
-//			w -= w % (w_ratio * h_ratio)
+		this.context.canvas.width = w;
+		this.context.canvas.height = h;
+/*		if (h/w > h_ratio/w_ratio) {
+			w -= w % (w_ratio * h_ratio)
 			this.context.canvas.width = w;
 			this.context.canvas.height = w * (h_ratio/w_ratio)
 		} else {
-//			h -= h % (w_ratio * h_ratio)
+			h -= h % (w_ratio * h_ratio)
 			this.context.canvas.height = h;
 			this.context.canvas.width = h * (w_ratio/h_ratio)
-		}
+		} */
 
 		this.context.imageSmoothingEnabled = false;
 	}
