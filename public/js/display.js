@@ -34,6 +34,10 @@ const Display = function(canvas,contextWidth,contextHeight,bufferWidth,bufferHei
 
     };
 
+	this.drawImage = function(img,x,y) {
+		this.buffer.drawImage(img,x,y);
+	};
+
     this.render = function(top=16,right=16,zoomLevel) {
 		this.context.drawImage(this.buffer.canvas,right*-1,top*-1,this.buffer.canvas.width * zoomLevel,this.buffer.canvas.height * zoomLevel)
     };
