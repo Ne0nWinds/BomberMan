@@ -39,11 +39,34 @@ window.addEventListener("load", function() {
 
 		if (controller.placeBomb) {
 			if (world.player.placeBombActive) {
-				world.player.placeBomb(world.player.x + 18,world.player.y + 18,64)
-				socket.emit('add_bomb', {
-					id: world.player.bombID - 1,
-					bomb: world.player.bombs[world.player.bombID - 1],
-				})
+
+				if (world.player.bombs[world.player.bombID - 3] == undefined) {
+					let bombX = Math.floor(world.player.x / 64);
+					let bombY = Math.floor(world.player.y / 64);
+					let bombValid = true;
+					for (let i in world.bombs) {
+						if (i != socket.id) {
+							for (let x in world.bombs[i]) {
+								let b = world.bombs[i][x];
+								if (b.x == bombX && b.y == bombY) {bombValid = false; break}; 
+							}
+						} else {
+							for (let x in world.player.bombs) {
+								let b = world.player.bombs[x];
+								if (b.x == bombX && b.y == bombY) {bombValid = false; break}; 
+							}
+						}
+					}
+					if (bombValid) {
+						world.player.bombs[world.player.bombID] = new Bomb(bombX,bombY);
+						world.player.bombID++;
+						world.player.placeBombActive = false;
+						socket.emit('add_bomb', {
+							id: world.player.bombID - 1,
+							bomb: world.player.bombs[world.player.bombID - 1],
+						})
+					}
+				}
 			}
 		} else {
 			world.player.placeBombActive = true;
@@ -59,9 +82,16 @@ window.addEventListener("load", function() {
 		display.drawMap(world.map,0,world.tile_size);
 
 		for (let i in world.bombs) {
-			for (let x in world.bombs[i]) {
-				let b = world.bombs[i][x]
-				display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14,0);
+			if (i != socket.id) {
+				for (let x in world.bombs[i]) {
+					let b = world.bombs[i][x];
+					display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14,0);
+				}
+			} else {
+				for (let x in world.player.bombs) {
+					let b = world.player.bombs[x];
+					display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14,0);
+				}
 			}
 		}
 

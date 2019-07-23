@@ -93,24 +93,6 @@ const Player = function(color,x=64,y=64) {
 	}
 
 	this.placeBomb = function(x,y,tile_size) {
-		if (this.bombs[this.bombID - 3] == undefined) {
-			let bombX = Math.floor(x / tile_size);
-			let bombY = Math.floor(y / tile_size);
-			let bombValid = true;
-			for (let i = this.bombID - 3; i < this.bombID; i++) {
-				if (this.bombs[i] != undefined) {
-					if (this.bombs[i].x == bombX && this.bombs[i].y == bombY) {
-						bombValid = false;
-						break;
-					}
-				};
-			}
-			if (bombValid) {
-				this.bombs[this.bombID] = new Bomb(bombX,bombY);
-				this.bombID++;
-				this.placeBombActive = false;
-			}
-		}
 	}
 }
 
