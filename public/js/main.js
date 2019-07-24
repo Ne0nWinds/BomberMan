@@ -20,7 +20,10 @@ window.addEventListener("load", function() {
 	let crate = document.createElement("canvas").getContext("2d", {alpha:false})
 	crate.drawImage(document.getElementById("crate"),0,0)
 
-	display.drawMap(world.map,0,world.tile_size);
+	let wall = document.createElement("canvas").getContext("2d", {alpha:false})
+	wall.drawImage(document.getElementById("wall"),0,0)
+
+	display.drawMap(world.map,wall.canvas,world.tile_size);
 	display.drawItemMap(world.itemMap,crate.canvas,world.tile_size);
 
 

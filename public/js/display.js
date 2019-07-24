@@ -22,8 +22,8 @@ const Display = function(canvas,bufferWidth,bufferHeight) {
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < width; x++) {
 				if (!map[y][x]) {
-					this.mapBuffer.fillStyle = "#eae7c7";
-//					this.mapBuffer.drawImage(img,x*tile_size,y*tile_size);
+//					this.mapBuffer.fillStyle = "#eae7c7";
+					this.mapBuffer.drawImage(img,x*tile_size,y*tile_size);
 				} else {
         			this.mapBuffer.fillStyle = "brown";
 				}

@@ -36,14 +36,16 @@ io.on('connection', function (socket) {
 		bombs[socket.id][data.id] = data.bomb;
 	});
 	socket.on('detonate_bomb', function(data) {
-		bombs[data.socket_id][data.id].detonated = true;
-		let b = bombs[data.socket_id][data.id];
-		if (b.crateRight == undefined) {
-			bombs[data.socket_id][data.id].crateRight = data.crateRight;
-			io.emit('destroy_crate', {
-				x:data.crateRight.x,
-				y:data.crateRight.y
-			});
+		if (bombs[data.socket_id][data.id] != undefined) {
+			bombs[data.socket_id][data.id].detonated = true;
+			let b = bombs[data.socket_id][data.id];
+			if (b.crateRight == undefined && data.crateRight != undefined) {
+				bombs[data.socket_id][data.id].crateRight = data.crateRight;
+				io.emit('destroy_crate', {
+					x:data.crateRight.x,
+					y:data.crateRight.y
+				});
+			}
 		}
 	});
 	socket.on('remove_bomb', function(data) {
