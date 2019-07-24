@@ -23,6 +23,8 @@ window.addEventListener("load", function() {
 	}
 
 	const update = function() {
+
+
 		if (controller.placeBomb) {
 			if (world.player.placeBombActive) {
 
@@ -44,7 +46,7 @@ window.addEventListener("load", function() {
 						}
 					}
 					if (bombValid) {
-						world.player.bombs[world.player.bombID] = new Bomb(bombX,bombY);
+						world.player.bombs[world.player.bombID] = new Bomb(bombX,bombY,Date.now());
 						world.player.bombID++;
 						world.player.placeBombActive = false;
 						socket.emit('add_bomb', {
@@ -61,6 +63,14 @@ window.addEventListener("load", function() {
 			world.player.move(5 * controller.mod,engine.time_delta,controller.angle)
 			world.update();
 			socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
+		}
+		let lu = Date.now();
+		for (let i in world.bombs) {
+			for (let x in world.bombs[i]) {
+				if (lu - world.bombs[i][x].timeStamp > 2600) {
+					world.bombs[i][x].detonated = true;
+				}
+			}
 		}
 	}
 	

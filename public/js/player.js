@@ -96,9 +96,10 @@ const Player = function(color,x=64,y=64) {
 	}
 }
 
-const Bomb = function(x,y) {
+const Bomb = function(x,y,timestamp) {
 	this.x = x;
 	this.y = y;
-	this.timeStamp = Date.now();
+	this.timeStamp = timestamp;
+	this.detonated = false;
 	this.power = 3;
 }

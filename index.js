@@ -24,6 +24,7 @@ io.on('connection', function (socket) {
 
 	socket.on('disconnect', function () {
 		delete players[socket.id]
+		delete bombs[socket.id]
 		io.emit('update', players)
 	});
 
@@ -33,18 +34,11 @@ io.on('connection', function (socket) {
 
 	socket.on('add_bomb', function(data) {
 		bombs[socket.id][data.id] = data.bomb;
-		bombs[socket.id][data.id].timeSince = 0;
 	});
 
 })
 
 setInterval(() => {
-	let date = Date.now();
-	for (let p in bombs) {
-		for (let b in bombs[p]) {
-			bombs[p][b].timeSince = date - bombs[p][b].timeStamp
-		}
-	}
 	io.emit('update_bombs',bombs)
 	io.emit('update',players)
 }, 8)
