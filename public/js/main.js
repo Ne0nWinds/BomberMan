@@ -35,11 +35,14 @@ window.addEventListener("load", function() {
 
 		let lu = Date.now();
 		for (let i in world.bombs) {
+			if (i == socket.id) {
+				world.player.bombs = world.bombs[i];
+			};
 			for (let x in world.bombs[i]) {
 				let b = world.bombs[i][x]
 				if (lu - b.timeStamp > 3200) {
 					delete world.bombs[i][x]
-					if (i == socket.id) delete world.player.bombs[x];
+					if (i == socket.id) {delete world.player.bombs[x]};
 					socket.emit('remove_bomb', { id: x, socket_id: i });
 				} else if (lu - b.timeStamp > 2600) {
 
@@ -51,11 +54,38 @@ window.addEventListener("load", function() {
 							break;
 						}
 					}
+					let crateLeft;
+					for (let h = b.x - 1; h >= b.x - b.power;h--) {
+						if (world.map[b.y][h] == 1) break;
+						if (world.itemMap[b.y][h] == 1) {
+							crateLeft = {x:h,y:b.y};
+							break;
+						}
+					}
+					let crateUp;
+					for (let h = b.y - 1; h >= b.y - b.power;h--) {
+						if (!world.map[h] || world.map[h][b.x] == 1) break;
+						if (world.itemMap[h][b.x] == 1) {
+							crateUp = {x:b.x,y:h};
+							break;
+						}
+					}
+					let crateDown;
+					for (let h = b.y + 1; h <= b.y + b.power;h++) {
+						if (!world.map[h] || world.map[h][b.x] == 1) break;
+						if (world.itemMap[h][b.x] == 1) {
+							crateDown = {x:b.x,y:h};
+							break;
+						}
+					}
 					socket.emit('detonate_bomb', 
 					{
 						id: x,
 						socket_id: i,
 						crateRight:crateRight,
+						crateLeft:crateLeft,
+						crateUp:crateUp,
+						crateDown:crateDown,
 					});
 				} 
 			}

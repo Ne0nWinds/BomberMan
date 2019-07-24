@@ -37,7 +37,7 @@ const World = function() {
                 old_x = Math.floor((object.old_x + x * object.width) / this.tile_size)
                 old_y = Math.floor((object.old_y + y * object.height)  / this.tile_size)
 
-				if (this.map[current_y][old_x] == 1) {
+				if (this.map[current_y][old_x] == 1 || this.itemMap[current_y][old_x] == 1) {
 					if (object.velocity_y > 0) {
 						object.y = current_y * this.tile_size - object.height - 0.01;
 					} else if (object.velocity_y < 0) {
@@ -46,7 +46,7 @@ const World = function() {
 				}
 
 
-				if (this.map[old_y][current_x] == 1) {
+				if (this.map[old_y][current_x] == 1 || this.itemMap[old_y][current_x] == 1) {
 					if (object.velocity_x > 0) {
 						object.x = current_x * this.tile_size - object.width - 0.1;
 					} else if (object.velocity_x < 0) {

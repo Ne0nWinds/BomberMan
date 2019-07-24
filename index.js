@@ -36,7 +36,7 @@ io.on('connection', function (socket) {
 		bombs[socket.id][data.id] = data.bomb;
 	});
 	socket.on('detonate_bomb', function(data) {
-		if (bombs[data.socket_id][data.id] != undefined) {
+		if (bombs[data.socket_id] == undefined || bombs[data.socket_id][data.id] == undefined) return;
 			bombs[data.socket_id][data.id].detonated = true;
 			let b = bombs[data.socket_id][data.id];
 			if (b.crateRight == undefined && data.crateRight != undefined) {
@@ -46,9 +46,31 @@ io.on('connection', function (socket) {
 					y:data.crateRight.y
 				});
 			}
-		}
+			if (b.crateLeft == undefined && data.crateLeft != undefined) {
+				bombs[data.socket_id][data.id].crateLeft = data.crateLeft;
+				io.emit('destroy_crate', {
+					x:data.crateLeft.x,
+					y:data.crateLeft.y
+				});
+			}
+			if (b.crateUp == undefined && data.crateUp != undefined) {
+				bombs[data.socket_id][data.id].crateUp = data.crateUp;
+				io.emit('destroy_crate', {
+					x:data.crateUp.x,
+					y:data.crateUp.y
+				});
+			}
+			if (b.crateDown == undefined && data.crateDown != undefined) {
+				bombs[data.socket_id][data.id].crateDown = data.crateDown;
+				io.emit('destroy_crate', {
+					x:data.crateDown.x,
+					y:data.crateDown.y
+				});
+			}
+		
 	});
 	socket.on('remove_bomb', function(data) {
+		if (bombs[data.socket_id] == undefined || bombs[data.socket_id][data.id] == undefined) return;
 		delete bombs[data.socket_id][data.id]
 	});
 
