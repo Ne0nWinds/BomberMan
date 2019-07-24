@@ -1,9 +1,10 @@
 const Display = function(canvas,bufferWidth,bufferHeight) {
 
 	this.context = canvas.getContext("2d", { alpha:false })
-	this.buffer = document.createElement("canvas").getContext("2d", { alpha:false })
-	this.buffer.canvas.width = bufferWidth;
-	this.buffer.canvas.height = bufferHeight;
+	this.buffer = document.createElement("canvas").getContext("2d")
+	this.mapBuffer = document.createElement("canvas").getContext("2d", { alpha:false })
+	this.mapBuffer.canvas.width = this.buffer.canvas.width = bufferWidth;
+	this.mapBuffer.canvas.height = this.buffer.canvas.height = bufferHeight;
 
 	this.fill = function(color) {
 
@@ -20,18 +21,20 @@ const Display = function(canvas,bufferWidth,bufferHeight) {
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < width; x++) {
 				if (!map[y][x]) {
-//					this.drawImage(img,x*tile_size,y*tile_size);
-					this.drawRectangle(x*tile_size,y*tile_size,tile_size,tile_size,"black")
+					this.mapBuffer.drawImage(img,x*tile_size,y*tile_size);
 				} else {
-					this.drawRectangle(x*tile_size,y*tile_size,tile_size,tile_size,"white")
+        			this.mapBuffer.fillStyle = "white";
+					this.mapBuffer.fillRect(x*tile_size,y*tile_size,tile_size,tile_size);
 				}
 			}
 		}
 
 	}
+	this.clear = function() {
+		this.buffer.clearRect(0,0,this.buffer.canvas.width,this.buffer.canvas.height);
+	}
 
     this.drawRectangle = function(x,y,w,h,color) {
-
         this.buffer.fillStyle = color;
         this.buffer.fillRect(Math.round(x),Math.round(y),w,h);
 
@@ -42,8 +45,9 @@ const Display = function(canvas,bufferWidth,bufferHeight) {
 	};
 
     this.render = function(top=16,right=16,zoomLevel) {
-		this.context.clearRect(0,0,this.context.canvas.width,this.context.canvas.height)
-		this.context.drawImage(this.buffer.canvas,right*-1,top*-1,this.buffer.canvas.width * zoomLevel,this.buffer.canvas.height * zoomLevel)
+		this.context.clearRect(0,0,this.context.canvas.width,this.context.canvas.height);
+		this.context.drawImage(this.mapBuffer.canvas,right*-1,top*-1,this.buffer.canvas.width * zoomLevel,this.buffer.canvas.height * zoomLevel);
+		this.context.drawImage(this.buffer.canvas,right*-1,top*-1,this.buffer.canvas.width * zoomLevel,this.buffer.canvas.height * zoomLevel);
     };
 
 

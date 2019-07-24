@@ -16,6 +16,9 @@ window.addEventListener("load", function() {
 	const display = new Display(document.querySelector("#canvas"),world.map[0].length * world.tile_size,world.map.length * world.tile_size)
 	let c4 = document.createElement("canvas").getContext("2d")
 	c4.drawImage(document.getElementById("c4"),0,0)
+	let dirt = document.createElement("canvas").getContext("2d", {alpha:false})
+	dirt.drawImage(document.getElementById("dirt"),0,0)
+	display.drawMap(world.map,dirt.canvas,world.tile_size);
 
 
 	const resize = function() {
@@ -75,7 +78,7 @@ window.addEventListener("load", function() {
 	}
 	
 	const render = function() {
-		display.drawMap(world.map,0,world.tile_size);
+		display.clear()
 
 		for (let i in world.bombs) {
 			if (i != socket.id) {
