@@ -25,7 +25,6 @@ const Display = function(canvas,bufferWidth,bufferHeight) {
 					this.mapBuffer.fillStyle = "#eae7c7";
 					this.mapBuffer.fillRect(x*tile_size,y*tile_size,tile_size,tile_size);
 				} else {
-//        			this.mapBuffer.fillStyle = "brown";
 					this.mapBuffer.drawImage(img,x*tile_size,y*tile_size);
 				}
 			}
