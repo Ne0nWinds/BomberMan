@@ -30,6 +30,33 @@ window.addEventListener("load", function() {
 
 	const update = function() {
 
+		let lu = Date.now();
+		for (let i in world.bombs) {
+			for (let x in world.bombs[i]) {
+				let b = world.bombs[i][x]
+				if (lu - b.timeStamp > 3200) {
+					delete world.bombs[i][x]
+					if (i == socket.id) delete world.player.bombs[x];
+					socket.emit('remove_bomb', { id: x, socket_id: i });
+				} else if (lu - b.timeStamp > 2600) {
+
+					let crateRight;
+					for (let h = b.x + 1; h <= b.x + b.power;h++) {
+						if (world.map[b.y][h] == 1) break;
+						if (world.itemMap[b.y][h] == 1) {
+							crateRight = {x:h,y:b.y};
+							break;
+						}
+					}
+					socket.emit('detonate_bomb', 
+					{
+						id: x,
+						socket_id: i,
+						crateRight:crateRight,
+					});
+				} 
+			}
+		}
 
 		if (controller.placeBomb) {
 			if (world.player.placeBombActive) {
@@ -69,14 +96,6 @@ window.addEventListener("load", function() {
 			world.player.move(5 * controller.mod,engine.time_delta,controller.angle)
 			world.update();
 			socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
-		}
-		let lu = Date.now();
-		for (let i in world.bombs) {
-			for (let x in world.bombs[i]) {
-				if (lu - world.bombs[i][x].timeStamp > 2600) {
-					world.bombs[i][x].detonated = true;
-				}
-			}
 		}
 	}
 	
@@ -118,5 +137,10 @@ window.addEventListener("load", function() {
 	socket.on('update_bombs', function(data) {
 		world.bombs = data;
 	})
+	socket.on('destroy_crate', function(data) {
+		console.log('wut')
+		display.destroyCrate(data.x,data.y,world.tile_size);
+		world.itemMap[data.y][data.x] = 0;
+	});
 });
 

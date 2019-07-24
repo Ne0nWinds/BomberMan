@@ -116,4 +116,5 @@ const Bomb = function(x,y,timestamp) {
 	this.timeStamp = timestamp;
 	this.detonated = false;
 	this.power = 3;
+	this.crateUp = this.crateDown = this.crateRight = this.crateLeft = undefined;
 }
