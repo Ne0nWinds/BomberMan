@@ -1,13 +1,10 @@
 const World = function() {
-	this.mapKey = {
-		"0": "rgba(0,0,0,1)",
-		"1": "white",
-	}
 
 	this.player = new Player("red");
 	this.other_players = { };
 	this.bombs = { };
-	this.map = [];
+	this.map = []; // 0 : open space, 1 : wall
+	this.itemMap = []; // 0 : open space, 1 : crate
 	this.spawn_points = [];
 	this.tile_size = 64;
 
@@ -15,10 +12,19 @@ const World = function() {
 		let i, j;
 		for (i = 0; i < SizeY; i++) {
 			this.map.push([])
+			this.itemMap.push([])
 			for (j = 0; j < SizeX; j++) {
 				this_point = i%2 * j%2;
 				this.map[i].push(this_point)
-				if (!this_point) this.spawn_points.push({y:i,x:j}); 
+
+				if (!this_point) {
+					if (!(i%2 ^ j%2) && i > 0 && j > 0 && i < SizeY - 1 && j < SizeX - 1) {
+						this.spawn_points.push({y:i,x:j})
+					}
+					this.itemMap[i].push(1);
+				} else {
+					this.itemMap[i].push(0);
+				}
 			}
 		}
 	}
@@ -54,6 +60,14 @@ const World = function() {
 
 	this.spawnPlayer = function() {
 		let currentSpawn = this.spawn_points[randInt(0,this.spawn_points.length - 1)];
+
+		this.itemMap[currentSpawn.y][currentSpawn.x] = 0;
+		this.itemMap[currentSpawn.y + 1][currentSpawn.x] = 0;
+		this.itemMap[currentSpawn.y - 1][currentSpawn.x] = 0;
+		this.itemMap[currentSpawn.y][currentSpawn.x + 1] = 0;
+		this.itemMap[currentSpawn.y][currentSpawn.x - 1] = 0;
+		console.log(this.itemMap)
+
 		this.player.x = currentSpawn.x * this.tile_size + ((this.tile_size - this.player.width)/2);
 		this.player.y = currentSpawn.y * this.tile_size + ((this.tile_size - this.player.height)/2);
 		this.player.alive = true;
