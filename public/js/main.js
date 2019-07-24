@@ -11,14 +11,17 @@ window.addEventListener("load", function() {
 	const world = new World();
 	world.generateMap(25,25);
 	world.spawnPlayer();
-	socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
 
 	const display = new Display(document.querySelector("#canvas"),world.map[0].length * world.tile_size,world.map.length * world.tile_size)
+
 	let c4 = document.createElement("canvas").getContext("2d")
 	c4.drawImage(document.getElementById("c4"),0,0)
-	let dirt = document.createElement("canvas").getContext("2d", {alpha:false})
-	dirt.drawImage(document.getElementById("dirt"),0,0)
-	display.drawMap(world.map,dirt.canvas,world.tile_size);
+
+	let crate = document.createElement("canvas").getContext("2d", {alpha:false})
+	crate.drawImage(document.getElementById("crate"),0,0)
+
+	display.drawMap(world.map,0,world.tile_size);
+	display.drawItemMap(world.itemMap,crate.canvas,world.tile_size);
 
 
 	const resize = function() {
@@ -32,8 +35,8 @@ window.addEventListener("load", function() {
 			if (world.player.placeBombActive) {
 
 				if (world.player.bombs[world.player.bombID - 3] == undefined) {
-					let bombX = Math.floor(world.player.x / 64);
-					let bombY = Math.floor(world.player.y / 64);
+					let bombX = Math.floor((world.player.x + world.player.width /2) / 64);
+					let bombY = Math.floor((world.player.y + world.player.height /2) / 64);
 					let bombValid = true;
 					for (let i in world.bombs) {
 						if (i != socket.id) {
@@ -81,15 +84,10 @@ window.addEventListener("load", function() {
 		display.clear()
 
 		for (let i in world.bombs) {
-			if (i != socket.id) {
-				for (let x in world.bombs[i]) {
-					let b = world.bombs[i][x];
-					display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14,0);
-				}
-			} else {
-				for (let x in world.player.bombs) {
-					let b = world.player.bombs[x];
-					display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14,0);
+			for (let x in world.bombs[i]) {
+				let b = world.bombs[i][x];
+				if (!b.detonated) {
+					display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14,0) 
 				}
 			}
 		}
@@ -107,6 +105,7 @@ window.addEventListener("load", function() {
 		display.render(world.player.y - display.context.canvas.height / 2 + 18,world.player.x - display.context.canvas.width / 2 + 18,1);
 	}
 	const engine = new Engine(60,update,render);
+	socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
 	resize();
 	engine.start();
 
