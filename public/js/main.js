@@ -3,8 +3,8 @@ function randInt(min,max) {
 }
 window.addEventListener("load", function() {
 
-	const socket = io();
 
+	const socket = io();
 	const controller = new KeyboardController("w","a","s","d"," ")
 //	const controller = new GamePadController();
 
@@ -68,53 +68,121 @@ window.addEventListener("load", function() {
 			};
 			for (let x in world.bombs[i]) {
 				let b = world.bombs[i][x]
-				if (lu - b.timeStamp > 3200) {
+				if (lu - b.timeStamp > 2750) {
 					delete world.bombs[i][x]
 					if (i == socket.id) {delete world.player.bombs[x]};
 					socket.emit('remove_bomb', { id: x, socket_id: i });
 				} else if (lu - b.timeStamp > 2600) {
 
-					let crateRight;
-					for (let h = b.x + 1; h <= b.x + b.power;h++) {
-						if (world.map[b.y][h] == 1) break;
-						if (world.itemMap[b.y][h] == 1) {
-							crateRight = {x:h,y:b.y};
-							break;
+					if (b.detonated == false) {
+						let explosion = {
+							left: undefined,
+							right: undefined,
+							down: undefined,
+							up: undefined,
+						};
+
+						let crateRight;
+						for (let h = b.x + 1; h <= b.x + b.power;h++) {
+							if (world.map[b.y][h] == 1) {
+								explosion.right = h;
+								break;
+							}
+							if (world.itemMap[b.y][h] == 1) {
+								crateRight = {x:h,y:b.y};
+								explosion.right = h;
+								break;
+							}
+						}
+						if (explosion.right == undefined) {
+							explosion.right = b.x + b.power;
+						}
+
+						let crateLeft;
+						for (let h = b.x - 1; h >= b.x - b.power;h--) {
+							if (world.map[b.y][h] == 1) {
+								explosion.left = h;
+								break;
+							}
+							if (world.itemMap[b.y][h] == 1) {
+								crateLeft = {x:h,y:b.y};
+								explosion.left = h;
+								break;
+							}
+						}
+						if (explosion.left == undefined) {
+							explosion.left = b.x - b.power;
+						}
+
+						let crateUp;
+						for (let h = b.y - 1; h >= b.y - b.power;h--) {
+							if (!world.map[h] || world.map[h][b.x] == 1) {
+								explosion.up = h;
+								break;
+							}
+							if (world.itemMap[h][b.x] == 1) {
+								crateUp = {x:b.x,y:h};
+								explosion.up = h;
+								break;
+							}
+						}
+						if (explosion.up == undefined) {
+							explosion.up = b.y - b.power;
+						}
+
+						let crateDown;
+						for (let h = b.y + 1; h <= b.y + b.power;h++) {
+							if (!world.map[h] || world.map[h][b.x] == 1) {
+								explosion.down = h;
+								break;
+							}
+							if (world.itemMap[h][b.x] == 1) {
+								crateDown = {x:b.x,y:h};
+								explosion.down = h;
+								break;
+							}
+						}
+						if (explosion.down == undefined) {
+							explosion.down = b.y + b.power;
+						}
+
+						world.bombs[i][x].crateRight = crateRight;
+						world.bombs[i][x].crateLeft = crateLeft;
+						world.bombs[i][x].crateUp = crateUp;
+						world.bombs[i][x].crateDown = crateDown;
+						world.bombs[i][x].detonated = true;
+						world.bombs[i][x].explosion = explosion;
+
+						socket.emit('detonate_bomb', 
+						{
+							id: x,
+							socket_id: i,
+							crateRight:crateRight,
+							crateLeft:crateLeft,
+							crateUp:crateUp,
+							crateDown:crateDown,
+							explosion:explosion
+						});
+					}
+
+					let p = world.player;
+					if (p.alive) {
+						for (let y = 0; y < 2;y++) {
+							for (let x = 0; x < 2;x++) {
+								let playerTileX = Math.floor((p.x + x * p.width) / world.tile_size);
+								let playerTileY = Math.floor((p.y + y * p.height) / world.tile_size);
+
+								if (playerTileX >= b.explosion.left && playerTileX <= b.explosion.right && playerTileY == b.y) {
+									world.player.alive = false;
+									socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
+								}
+								if (playerTileY >= b.explosion.up && playerTileY <= b.explosion.down && playerTileX == b.x) {
+									world.player.alive = false;
+									socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
+								}
+							}
 						}
 					}
-					let crateLeft;
-					for (let h = b.x - 1; h >= b.x - b.power;h--) {
-						if (world.map[b.y][h] == 1) break;
-						if (world.itemMap[b.y][h] == 1) {
-							crateLeft = {x:h,y:b.y};
-							break;
-						}
-					}
-					let crateUp;
-					for (let h = b.y - 1; h >= b.y - b.power;h--) {
-						if (!world.map[h] || world.map[h][b.x] == 1) break;
-						if (world.itemMap[h][b.x] == 1) {
-							crateUp = {x:b.x,y:h};
-							break;
-						}
-					}
-					let crateDown;
-					for (let h = b.y + 1; h <= b.y + b.power;h++) {
-						if (!world.map[h] || world.map[h][b.x] == 1) break;
-						if (world.itemMap[h][b.x] == 1) {
-							crateDown = {x:b.x,y:h};
-							break;
-						}
-					}
-					socket.emit('detonate_bomb', 
-					{
-						id: x,
-						socket_id: i,
-						crateRight:crateRight,
-						crateLeft:crateLeft,
-						crateUp:crateUp,
-						crateDown:crateDown,
-					});
 				} 
 			}
 		}

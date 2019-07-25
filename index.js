@@ -65,7 +65,7 @@ io.on('connection', function (socket) {
 		bombs[socket.id][data.id] = data.bomb;
 	});
 	socket.on('detonate_bomb', function(data) {
-		if (bombs[data.socket_id] == undefined || bombs[data.socket_id][data.id] == undefined) return;
+		if (bombs[data.socket_id] == undefined || bombs[data.socket_id][data.id] == undefined || bombs[data.socket_id].detonated) return;
 			bombs[data.socket_id][data.id].detonated = true;
 			let b = bombs[data.socket_id][data.id];
 			if (b.crateRight == undefined && data.crateRight != undefined) {
@@ -100,6 +100,7 @@ io.on('connection', function (socket) {
 					y:data.crateDown.y
 				});
 			}
+			if (b.explosion == undefined) bombs[data.socket_id][data.id].explosion = data.explosion;
 	});
 	socket.on('remove_bomb', function(data) {
 		if (bombs[data.socket_id] == undefined || bombs[data.socket_id][data.id] == undefined) return;
