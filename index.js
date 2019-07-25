@@ -27,6 +27,24 @@ function genMap(SizeX,SizeY) {
 }
 genMap(25,25)
 
+function randInt(min,max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+let tile;
+function destroyCrate(x,y) {
+	if (Math.random() < 0.075) {
+		tile = 2;
+	} else {
+		tile = 0;
+	}
+	io.emit('destroy_crate', {
+		x:x,
+		y:y,
+		tile:tile
+	});
+}
+
 
 io.on('connection', function (socket) {
 	
@@ -71,34 +89,22 @@ io.on('connection', function (socket) {
 			if (b.crateRight == undefined && data.crateRight != undefined) {
 				bombs[data.socket_id][data.id].crateRight = data.crateRight;
 				itemMap[data.crateRight.y][data.crateRight.x] = 0;
-				io.emit('destroy_crate', {
-					x:data.crateRight.x,
-					y:data.crateRight.y
-				});
+				destroyCrate(data.crateRight.x,data.crateRight.y);
 			}
 			if (b.crateLeft == undefined && data.crateLeft != undefined) {
 				bombs[data.socket_id][data.id].crateLeft = data.crateLeft;
 				itemMap[data.crateLeft.y][data.crateLeft.x] = 0;
-				io.emit('destroy_crate', {
-					x:data.crateLeft.x,
-					y:data.crateLeft.y
-				});
+				destroyCrate(data.crateLeft.x,data.crateLeft.y);
 			}
 			if (b.crateUp == undefined && data.crateUp != undefined) {
 				bombs[data.socket_id][data.id].crateUp = data.crateUp;
 				itemMap[data.crateUp.y][data.crateUp.x] = 0;
-				io.emit('destroy_crate', {
-					x:data.crateUp.x,
-					y:data.crateUp.y
-				});
+				destroyCrate(data.crateUp.x,data.crateUp.y);
 			}
 			if (b.crateDown == undefined && data.crateDown != undefined) {
 				bombs[data.socket_id][data.id].crateDown = data.crateDown;
 				itemMap[data.crateDown.y][data.crateDown.x] = 0;
-				io.emit('destroy_crate', {
-					x:data.crateDown.x,
-					y:data.crateDown.y
-				});
+				destroyCrate(data.crateDown.x,data.crateDown.y);
 			}
 			if (b.explosion.up == undefined) bombs[data.socket_id][data.id].explosion = data.explosion;
 	});
