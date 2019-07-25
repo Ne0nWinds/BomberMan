@@ -24,6 +24,12 @@ window.addEventListener("load", function() {
 	let c4 = document.createElement("canvas").getContext("2d")
 	c4.drawImage(document.getElementById("c4"),0,0)
 
+	let fireball = document.createElement("canvas").getContext("2d")
+	fireball.drawImage(document.getElementById("fireball"),0,0)
+
+	let smoke = document.createElement("canvas").getContext("2d")
+	smoke.drawImage(document.getElementById("smoke"),0,0)
+
 	let crate = document.createElement("canvas").getContext("2d", {alpha:false})
 	crate.drawImage(document.getElementById("crate"),0,0)
 
@@ -236,6 +242,14 @@ window.addEventListener("load", function() {
 				let b = world.bombs[i][x];
 				if (!b.detonated) {
 					display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14,0) 
+				} else {
+					display.drawImage(fireball.canvas, b.x * world.tile_size - 24, b.y * world.tile_size - 24);
+					for (let f = b.explosion.up; f <= b.explosion.down; f++) {
+						display.drawImage(fireball.canvas, b.x * world.tile_size - 24, f * world.tile_size - 24);
+					}
+					for (let u = b.explosion.left; u <= b.explosion.right; u++) {
+						display.drawImage(fireball.canvas, u * world.tile_size - 24, b.y * world.tile_size - 24);
+					}
 				}
 			}
 		}

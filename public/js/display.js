@@ -22,7 +22,7 @@ const Display = function(canvas,bufferWidth,bufferHeight) {
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < width; x++) {
 				if (map[y][x] == 0) {
-					this.mapBuffer.fillStyle = "#eae7c7";
+					this.mapBuffer.fillStyle = "#ded0af";
 					this.mapBuffer.fillRect(x*tile_size,y*tile_size,tile_size,tile_size);
 				} else {
 					this.mapBuffer.drawImage(img,x*tile_size,y*tile_size);

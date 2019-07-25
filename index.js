@@ -100,7 +100,7 @@ io.on('connection', function (socket) {
 					y:data.crateDown.y
 				});
 			}
-			if (b.explosion == undefined) bombs[data.socket_id][data.id].explosion = data.explosion;
+			if (b.explosion.up == undefined) bombs[data.socket_id][data.id].explosion = data.explosion;
 	});
 	socket.on('remove_bomb', function(data) {
 		if (bombs[data.socket_id] == undefined || bombs[data.socket_id][data.id] == undefined) return;
