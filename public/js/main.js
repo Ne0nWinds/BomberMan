@@ -193,7 +193,7 @@ window.addEventListener("load", function() {
 			}
 		}
 
-		if (controller.placeBomb) {
+		if (controller.placeBomb && world.player.alive) {
 			if (world.player.placeBombActive) {
 
 				if (world.player.bombs[world.player.bombID - 3] == undefined) {
