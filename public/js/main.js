@@ -47,7 +47,7 @@ window.addEventListener("load", function() {
 	})
 	socket.on('destroy_crate', function(data) {
 		display.destroyCrate(data.x,data.y,world.tile_size);
-		world.itemMap[data.y][data.x] = 0;
+		world.itemMap[data.y][data.x] = data.tile;
 	});
 	socket.on('update_map', function(data) {
 		world.itemMap = data;
