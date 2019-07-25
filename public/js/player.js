@@ -58,18 +58,18 @@ const World = function() {
 					for (let x in this.bombs[i]) {
 						let b = this.bombs[i][x];
 						if (b.x == current_x && b.y == old_y) {
-							if (object.velocity_x > 0 && old_x != b.x) {
+							if (object.velocity_x > 0 && (object.old_x + object.width - object.velocity_x) / this.tile_size < b.x + 0.1) {
 								object.x = current_x * this.tile_size - object.width - 0.1;
-							} else if (object.velocity_x < 0 && old_x != b.x) {
+							} else if (object.velocity_x < 0 && (object.old_x - object.velocity_x) / this.tile_size > b.x + 0.9) {
 								object.x = current_x * this.tile_size + this.tile_size + 0.1;
-							}
+							} 
 						}
 						if (b.y == current_y && b.x == old_x) {
-							if (object.velocity_y > 0 && old_y != b.y) {
+							if (object.velocity_y > 0 && (object.old_y + object.height - object.velocity_y) / this.tile_size < b.y + 0.1) {
 								object.y = current_y * this.tile_size - object.height - 0.1;
-							} else if (object.velocity_y < 0 && old_y != b.y) {
+							} else if (object.velocity_y < 0 && (object.old_y - object.velocity_y) / this.tile_size > b.y + 0.9) {
 								object.y = current_y * this.tile_size + this.tile_size + 0.1;
-							}
+							} 
 						}
 					}
 				}
