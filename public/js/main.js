@@ -74,7 +74,7 @@ window.addEventListener("load", function() {
 			};
 			for (let x in world.bombs[i]) {
 				let b = world.bombs[i][x]
-				if (lu - b.timeStamp > 2750) {
+				if (lu - b.timeStamp > 3250) {
 					delete world.bombs[i][x]
 					if (i == socket.id) {delete world.player.bombs[x]};
 					socket.emit('remove_bomb', { id: x, socket_id: i });
@@ -91,7 +91,7 @@ window.addEventListener("load", function() {
 						let crateRight;
 						for (let h = b.x + 1; h <= b.x + b.power;h++) {
 							if (world.map[b.y][h] == 1) {
-								explosion.right = h;
+								explosion.right = h - 1;
 								break;
 							}
 							if (world.itemMap[b.y][h] == 1) {
@@ -107,7 +107,7 @@ window.addEventListener("load", function() {
 						let crateLeft;
 						for (let h = b.x - 1; h >= b.x - b.power;h--) {
 							if (world.map[b.y][h] == 1) {
-								explosion.left = h;
+								explosion.left = h + 1;
 								break;
 							}
 							if (world.itemMap[b.y][h] == 1) {
@@ -123,7 +123,7 @@ window.addEventListener("load", function() {
 						let crateUp;
 						for (let h = b.y - 1; h >= b.y - b.power;h--) {
 							if (!world.map[h] || world.map[h][b.x] == 1) {
-								explosion.up = h;
+								explosion.up = h + 1;
 								break;
 							}
 							if (world.itemMap[h][b.x] == 1) {
@@ -139,7 +139,7 @@ window.addEventListener("load", function() {
 						let crateDown;
 						for (let h = b.y + 1; h <= b.y + b.power;h++) {
 							if (!world.map[h] || world.map[h][b.x] == 1) {
-								explosion.down = h;
+								explosion.down = h - 1;
 								break;
 							}
 							if (world.itemMap[h][b.x] == 1) {
@@ -172,7 +172,7 @@ window.addEventListener("load", function() {
 					}
 
 					let p = world.player;
-					if (p.alive) {
+					if (p.alive && lu - b.timeStamp < 2750) {
 						for (let y = 0; y < 2;y++) {
 							for (let x = 0; x < 2;x++) {
 								let playerTileX = Math.floor((p.x + x * p.width) / world.tile_size);
@@ -236,19 +236,35 @@ window.addEventListener("load", function() {
 	
 	const render = function() {
 		display.clear()
+		let now = Date.now()
 
 		for (let i in world.bombs) {
 			for (let x in world.bombs[i]) {
 				let b = world.bombs[i][x];
 				if (!b.detonated) {
-					display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14,0) 
-				} else {
-					display.drawImage(fireball.canvas, b.x * world.tile_size - 24, b.y * world.tile_size - 24);
+					display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14) 
+				}
+			}
+		}
+
+		for (let i in world.bombs) {
+			for (let x in world.bombs[i]) {
+				let b = world.bombs[i][x];
+				if (b.detonated) {
+					let smoke_opacity = 1 - (now - b.timeStamp - 2600) / 700
 					for (let f = b.explosion.up; f <= b.explosion.down; f++) {
-						display.drawImage(fireball.canvas, b.x * world.tile_size - 24, f * world.tile_size - 24);
+						display.drawImage(smoke.canvas, b.x * world.tile_size - 24, f * world.tile_size - 24, smoke_opacity);
+						if (now - b.timeStamp < 2750) {
+							display.drawImage(fireball.canvas, b.x * world.tile_size - 24, f * world.tile_size - 24);
+						}
 					}
 					for (let u = b.explosion.left; u <= b.explosion.right; u++) {
-						display.drawImage(fireball.canvas, u * world.tile_size - 24, b.y * world.tile_size - 24);
+						if (u != b.x) {
+							display.drawImage(smoke.canvas, u * world.tile_size - 24, b.y * world.tile_size - 24, smoke_opacity);
+							if (now - b.timeStamp < 2750) {
+								display.drawImage(fireball.canvas, u * world.tile_size - 24, b.y * world.tile_size - 24);
+							}
+						}
 					}
 				}
 			}

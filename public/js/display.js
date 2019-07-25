@@ -61,8 +61,10 @@ const Display = function(canvas,bufferWidth,bufferHeight) {
 
     };
 
-	this.drawImage = function(img,x,y) {
+	this.drawImage = function(img,x,y,alpha = 1) {
+		this.buffer.globalAlpha = alpha;
 		this.buffer.drawImage(img,x,y);
+		this.buffer.globalAlpha = 1;
 	};
 
     this.render = function(top=16,right=16,zoomLevel) {
