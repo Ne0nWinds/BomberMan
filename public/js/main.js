@@ -11,6 +11,13 @@ window.addEventListener("load", function() {
 	const world = new World();
 	world.generateMap(25,25);
 	world.spawnPlayer();
+	socket.emit('edit_map',[
+		{x:Math.floor(world.player.x / world.tile_size), y:Math.floor(world.player.y / world.tile_size)},
+		{x:Math.floor(world.player.x / world.tile_size) + 1, y:Math.floor(world.player.y / world.tile_size)},
+		{x:Math.floor(world.player.x / world.tile_size) - 1, y:Math.floor(world.player.y / world.tile_size)},
+		{x:Math.floor(world.player.x / world.tile_size), y:Math.floor(world.player.y / world.tile_size) + 1},
+		{x:Math.floor(world.player.x / world.tile_size), y:Math.floor(world.player.y / world.tile_size) - 1},
+	]);
 
 	const display = new Display(document.querySelector("#canvas"),world.map[0].length * world.tile_size,world.map.length * world.tile_size)
 
@@ -25,6 +32,27 @@ window.addEventListener("load", function() {
 
 	display.drawMap(world.map,wall.canvas,world.tile_size);
 	display.drawItemMap(world.itemMap,crate.canvas,world.tile_size);
+
+	socket.on('update', function (data) {
+		world.other_players = data;
+	});
+	socket.on('update_bombs', function(data) {
+		world.bombs = data;
+	})
+	socket.on('destroy_crate', function(data) {
+		display.destroyCrate(data.x,data.y,world.tile_size);
+		world.itemMap[data.y][data.x] = 0;
+	});
+	socket.on('update_map', function(data) {
+		world.itemMap = data;
+		for (let y=0; y< data.length;y++) {
+			for (let x=0;x<data[0].length;x++) {
+				if (data[y][x] == 0) {
+					display.destroyCrate(x,y,world.tile_size);
+				}
+			}
+		}
+	});
 
 
 	const resize = function() {
@@ -164,16 +192,5 @@ window.addEventListener("load", function() {
 	window.addEventListener("keydown", controller.update);
 	window.addEventListener("keyup", controller.update);
 	window.addEventListener("resize", resize)
-	socket.on('update', function (data) {
-		world.other_players = data;
-	});
-	socket.on('update_bombs', function(data) {
-		world.bombs = data;
-	})
-	socket.on('destroy_crate', function(data) {
-		console.log('wut')
-		display.destroyCrate(data.x,data.y,world.tile_size);
-		world.itemMap[data.y][data.x] = 0;
-	});
 });
 

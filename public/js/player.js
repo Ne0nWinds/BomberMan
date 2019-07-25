@@ -66,7 +66,6 @@ const World = function() {
 		this.itemMap[currentSpawn.y - 1][currentSpawn.x] = 0;
 		this.itemMap[currentSpawn.y][currentSpawn.x + 1] = 0;
 		this.itemMap[currentSpawn.y][currentSpawn.x - 1] = 0;
-		console.log(this.itemMap)
 
 		this.player.x = currentSpawn.x * this.tile_size + ((this.tile_size - this.player.width)/2);
 		this.player.y = currentSpawn.y * this.tile_size + ((this.tile_size - this.player.height)/2);
