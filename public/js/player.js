@@ -39,7 +39,7 @@ const World = function() {
 
 				if (this.map[current_y] == undefined || this.map[current_y][old_x] == 1 || this.itemMap[current_y][old_x] == 1) {
 					if (object.velocity_y > 0) {
-						object.y = current_y * this.tile_size - object.height - 0.01;
+						object.y = current_y * this.tile_size - object.height - 0.1;
 					} else if (object.velocity_y < 0) {
 						object.y = current_y * this.tile_size + this.tile_size + 0.1;
 					}
@@ -52,6 +52,26 @@ const World = function() {
 					} else if (object.velocity_x < 0) {
 						object.x = current_x * this.tile_size + this.tile_size + 0.1;
 					}   
+				}
+
+				for (let i in this.bombs) {
+					for (let x in this.bombs[i]) {
+						let b = this.bombs[i][x];
+						if (b.x == current_x) {
+							if (object.velocity_x > 0 && old_x != b.x) {
+								object.x = current_x * this.tile_size - object.width - 0.1;
+							} else if (object.velocity_x < 0 && old_x != b.x) {
+								object.x = current_x * this.tile_size + this.tile_size + 0.1;
+							}
+						}
+						if (b.y == current_y) {
+							if (object.velocity_y > 0 && old_y != b.y) {
+								object.y = current_y * this.tile_size - object.height - 0.1;
+							} else if (object.velocity_y < 0 && old_y != b.y) {
+								object.y = current_y * this.tile_size + this.tile_size + 0.1;
+							}
+						}
+					}
 				}
 
 			}
