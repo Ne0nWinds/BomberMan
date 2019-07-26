@@ -91,7 +91,7 @@ window.addEventListener("load", function() {
 
 	const update = function() {
 
-		let lu = Date.now() - timeDiff;
+		let now = Date.now() - timeDiff;
 		for (let i in world.bombs) {
 			if (i == socket.id) {
 				world.player.bombs = world.bombs[i];
