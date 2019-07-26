@@ -21,6 +21,12 @@ window.addEventListener("load", function() {
 
 	const display = new Display(document.querySelector("#canvas"),world.map[0].length * world.tile_size,world.map.length * world.tile_size)
 
+	let grenade = document.createElement("canvas").getContext("2d")
+	grenade.drawImage(document.getElementById("grenade"),0,0)
+
+	let bomb = document.createElement("canvas").getContext("2d")
+	bomb.drawImage(document.getElementById("bomb"),0,0)
+
 	let c4 = document.createElement("canvas").getContext("2d")
 	c4.drawImage(document.getElementById("c4"),0,0)
 
@@ -59,7 +65,19 @@ window.addEventListener("load", function() {
 			}
 		}
 	});
-
+	socket.on('update_items', function(data) {
+		world.items = data;
+		console.log(world.items)
+	});
+	socket.on('give_item', function(data) {
+		if (data.type == 1) {
+			if (world.player.power == 2) {
+				world.player.power = 4;
+			} else if (world.player.power == 4) {
+				world.player.power = 7;
+			}
+		}
+	});
 
 	const resize = function() {
 		display.resize(window.innerWidth,window.innerHeight);
@@ -67,18 +85,18 @@ window.addEventListener("load", function() {
 
 	const update = function() {
 
-		let lu = Date.now();
+		let now = Date.now();
 		for (let i in world.bombs) {
 			if (i == socket.id) {
 				world.player.bombs = world.bombs[i];
 			};
 			for (let x in world.bombs[i]) {
 				let b = world.bombs[i][x]
-				if (lu - b.timeStamp > 3250) {
+				if (now - b.timeStamp > 3250) {
 					delete world.bombs[i][x]
 					if (i == socket.id) {delete world.player.bombs[x]};
 					socket.emit('remove_bomb', { id: x, socket_id: i });
-				} else if (lu - b.timeStamp > 2600) {
+				} else if (now - b.timeStamp > 2600) {
 
 					if (b.detonated == false) {
 						let explosion = {
@@ -172,7 +190,7 @@ window.addEventListener("load", function() {
 					}
 
 					let p = world.player;
-					if (p.alive && lu - b.timeStamp < 2750) {
+					if (p.alive && now - b.timeStamp < 2750) {
 						for (let y = 0; y < 2;y++) {
 							for (let x = 0; x < 2;x++) {
 								let playerTileX = Math.floor((p.x + x * p.width) / world.tile_size);
@@ -190,6 +208,15 @@ window.addEventListener("load", function() {
 						}
 					}
 				} 
+			}
+		}
+
+		for (let i in world.items) {
+			let item = world.items[i]
+			let playerTileX = Math.floor((world.player.x + world.player.width / 2) / world.tile_size);
+			let playerTileY = Math.floor((world.player.y + world.player.height / 2) / world.tile_size);
+			if (item.x == playerTileX && item.y == playerTileY) {
+				socket.emit('remove_item', {id:i});
 			}
 		}
 
@@ -214,7 +241,7 @@ window.addEventListener("load", function() {
 						}
 					}
 					if (bombValid) {
-						world.player.bombs[world.player.bombID] = new Bomb(bombX,bombY,Date.now());
+						world.player.bombs[world.player.bombID] = new Bomb(bombX,bombY,Date.now(),world.player.power);
 						world.player.bombID++;
 						world.player.placeBombActive = false;
 						socket.emit('add_bomb', {
@@ -238,11 +265,28 @@ window.addEventListener("load", function() {
 		display.clear()
 		let now = Date.now()
 
+		let bombDict = {
+			"2":grenade,
+			"4":bomb,
+			"7":c4,
+		}
+
+		for (let i in world.items) {
+			let item = world.items[i];
+			if (item.type == 1) {
+				if (world.player.power == 2) {
+					display.drawImage(bomb.canvas,item.x * world.tile_size + 14,item.y * world.tile_size + 14);
+				} else if (world.player.power == 4) {
+					display.drawImage(c4.canvas,item.x * world.tile_size + 14, item.y * world.tile_size + 14);
+				}
+			}
+		}
+
 		for (let i in world.bombs) {
 			for (let x in world.bombs[i]) {
 				let b = world.bombs[i][x];
 				if (!b.detonated) {
-					display.drawImage(c4.canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14) 
+					display.drawImage(bombDict[b.power].canvas,b.x * world.tile_size + 14,b.y * world.tile_size + 14) 
 				}
 			}
 		}

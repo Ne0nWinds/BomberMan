@@ -10,6 +10,7 @@ app.use(express.static(__dirname + '/public'));
 let players = {};
 let bombs = {};
 let itemMap = [];
+let items = {};
 
 function genMap(SizeX,SizeY) {
 	let i, j;
@@ -31,17 +32,16 @@ function randInt(min,max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-let tile;
+let itemID = 0;
 function destroyCrate(x,y) {
-	if (Math.random() < 0.075) {
-		tile = 2;
-	} else {
-		tile = 0;
+	if (Math.random() < 0.035) {
+		items[itemID] = {x:x,y:y,type:1};
+		itemID++;
+		io.emit('update_items', items);
 	}
 	io.emit('destroy_crate', {
 		x:x,
 		y:y,
-		tile:tile
 	});
 }
 
@@ -67,7 +67,7 @@ io.on('connection', function (socket) {
 		}
 	});
 	socket.emit('update_map', itemMap);
-
+	socket.emit('update_items', items);
 
 	socket.on('disconnect', function () {
 		delete players[socket.id]
@@ -113,6 +113,12 @@ io.on('connection', function (socket) {
 	socket.on('remove_bomb', function(data) {
 		if (bombs[data.socket_id] == undefined || bombs[data.socket_id][data.id] == undefined) return;
 		delete bombs[data.socket_id][data.id]
+	});
+
+	socket.on('remove_item', function(data) {
+		socket.emit('give_item', items[data.id]);
+		delete items[data.id];
+		io.emit('update_items', items[data.id]);
 	});
 
 })

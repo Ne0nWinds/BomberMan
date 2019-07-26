@@ -5,6 +5,7 @@ const World = function() {
 	this.bombs = { };
 	this.map = []; // 0 : open space, 1 : wall
 	this.itemMap = []; // 0 : open space, 1 : crate
+	this.items = {}; // type 1 : bomb upgrade
 	this.spawn_points = [];
 	this.tile_size = 64;
 
@@ -113,6 +114,7 @@ const Player = function(color,x=64,y=64) {
 	this.bombs = {};
 	this.bombID = 0;
 	this.placeBombActive = false;
+	this.power = 2;
 
 	this.move = function(speed, mod, angle) {
 		if (this.alive) {
@@ -129,12 +131,12 @@ const Player = function(color,x=64,y=64) {
 	}
 }
 
-const Bomb = function(x,y,timestamp) {
+const Bomb = function(x,y,timestamp,power) {
 	this.x = x;
 	this.y = y;
 	this.timeStamp = timestamp;
 	this.detonated = false;
-	this.power = 3;
+	this.power = power;
 	this.crateUp = this.crateDown = this.crateRight = this.crateLeft = undefined;
 	this.explosion = {
 		left: undefined,
