@@ -78,6 +78,12 @@ window.addEventListener("load", function() {
 			}
 		}
 	});
+	socket.emit('adjust_time', {time:Date.now()});
+	let timeDiff = 0;
+	socket.on('update_time', function (data){
+		timeDiff = data.diff;
+	});
+
 
 	const resize = function() {
 		display.resize(window.innerWidth,window.innerHeight);
@@ -85,7 +91,7 @@ window.addEventListener("load", function() {
 
 	const update = function() {
 
-		let now = Date.now();
+		let lu = Date.now() - timeDiff;
 		for (let i in world.bombs) {
 			if (i == socket.id) {
 				world.player.bombs = world.bombs[i];
@@ -209,6 +215,7 @@ window.addEventListener("load", function() {
 					}
 				} 
 			}
+
 		}
 
 		if (world.player.power != 7) {
@@ -265,7 +272,7 @@ window.addEventListener("load", function() {
 	
 	const render = function() {
 		display.clear()
-		let now = Date.now()
+		let now = Date.now() - timeDiff;
 
 		let bombDict = {
 			"2":grenade,

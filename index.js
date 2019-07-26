@@ -56,6 +56,13 @@ io.on('connection', function (socket) {
 	bombs[socket.id] = { };
 
 	socket.broadcast.emit('update', players);
+	
+	let timeDiff = 0;
+	socket.on('adjust_time', function (data) {
+		let timeDiff = data.time - Date.now();
+		console.log(timeDiff)
+		socket.emit('update_time', {diff:timeDiff});
+	});
 
 	socket.on('edit_map', function(data) {
 		for (let i = 0; i < data.length; i++) {
@@ -80,7 +87,10 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('add_bomb', function(data) {
-		bombs[socket.id][data.id] = data.bomb;
+		if (players[socket.id].alive) {
+			bombs[socket.id][data.id] = data.bomb;
+			bombs[socket.id][data.id].timeStamp = Date.now();
+		}
 	});
 	socket.on('detonate_bomb', function(data) {
 		if (bombs[data.socket_id] == undefined || bombs[data.socket_id][data.id] == undefined || bombs[data.socket_id].detonated) return;
