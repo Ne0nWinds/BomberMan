@@ -80,9 +80,7 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('add_bomb', function(data) {
-		if (players[socket.id].alive) {
-			bombs[socket.id][data.id] = data.bomb;
-		}
+		bombs[socket.id][data.id] = data.bomb;
 	});
 	socket.on('detonate_bomb', function(data) {
 		if (bombs[data.socket_id] == undefined || bombs[data.socket_id][data.id] == undefined || bombs[data.socket_id].detonated) return;
