@@ -34,7 +34,7 @@ function randInt(min,max) {
 
 let itemID = 0;
 function destroyCrate(x,y) {
-	if (Math.random() < 0.035) {
+	if (Math.random() < 0.04) {
 		items[itemID] = {x:x,y:y,type:1};
 		itemID++;
 		io.emit('update_items', items);
@@ -118,7 +118,7 @@ io.on('connection', function (socket) {
 	socket.on('remove_item', function(data) {
 		socket.emit('give_item', items[data.id]);
 		delete items[data.id];
-		io.emit('update_items', items[data.id]);
+		io.emit('update_items', items);
 	});
 
 })

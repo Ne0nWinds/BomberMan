@@ -211,12 +211,14 @@ window.addEventListener("load", function() {
 			}
 		}
 
-		for (let i in world.items) {
-			let item = world.items[i]
-			let playerTileX = Math.floor((world.player.x + world.player.width / 2) / world.tile_size);
-			let playerTileY = Math.floor((world.player.y + world.player.height / 2) / world.tile_size);
-			if (item.x == playerTileX && item.y == playerTileY) {
-				socket.emit('remove_item', {id:i});
+		if (world.player.power != 7) {
+			for (let i in world.items) {
+				let item = world.items[i]
+				let playerTileX = Math.floor((world.player.x + world.player.width / 2) / world.tile_size);
+				let playerTileY = Math.floor((world.player.y + world.player.height / 2) / world.tile_size);
+				if (item.x == playerTileX && item.y == playerTileY) {
+					socket.emit('remove_item', {id:i});
+				}
 			}
 		}
 
