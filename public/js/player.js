@@ -1,6 +1,11 @@
+function genColor() {
+    let color = "#" + Math.floor((Math.random() * (16777216))).toString(16);
+    if (color.length != 7) {color = color.slice(0, 1) + "0" + color.slice(1, 6); }
+    return color;
+}
 const World = function() {
 
-	this.player = new Player("red");
+	this.player = new Player("#0c609c");
 	this.other_players = { };
 	this.bombs = { };
 	this.map = []; // 0 : open space, 1 : wall
@@ -102,6 +107,7 @@ const World = function() {
 
 const Player = function(color,x=64,y=64) {
 	this.color = color;
+	this.speed = 4;
 	this.x = x;
 	this.y = y;
 	this.old_x = x;

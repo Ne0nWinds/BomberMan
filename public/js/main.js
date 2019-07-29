@@ -42,6 +42,9 @@ window.addEventListener("load", function() {
 	let wall = document.createElement("canvas").getContext("2d", {alpha:false})
 	wall.drawImage(document.getElementById("wall"),0,0)
 
+	let speed = document.createElement("canvas").getContext("2d", {alpha:true})
+	speed.drawImage(document.getElementById("speed"),0,0)
+
 	display.drawMap(world.map,wall.canvas,world.tile_size);
 	display.drawItemMap(world.itemMap,crate.canvas,world.tile_size);
 
@@ -76,12 +79,15 @@ window.addEventListener("load", function() {
 			} else if (world.player.power == 4) {
 				world.player.power = 7;
 			}
+		} else if (data.type == 2) {
+			world.player.speed += 2/(world.player.speed);
 		}
 	});
 	socket.emit('adjust_time', {time:Date.now()});
 	let timeDiff = 0;
 	socket.on('update_time', function (data){
 		timeDiff = data.diff;
+		engine.start();
 	});
 
 
@@ -218,14 +224,12 @@ window.addEventListener("load", function() {
 
 		}
 
-		if (world.player.power != 7) {
-			for (let i in world.items) {
-				let item = world.items[i]
-				let playerTileX = Math.floor((world.player.x + world.player.width / 2) / world.tile_size);
-				let playerTileY = Math.floor((world.player.y + world.player.height / 2) / world.tile_size);
-				if (item.x == playerTileX && item.y == playerTileY) {
-					socket.emit('remove_item', {id:i});
-				}
+		for (let i in world.items) {
+			let item = world.items[i]
+			let playerTileX = Math.floor((world.player.x + world.player.width / 2) / world.tile_size);
+			let playerTileY = Math.floor((world.player.y + world.player.height / 2) / world.tile_size);
+			if (item.x == playerTileX && item.y == playerTileY) {
+				socket.emit('remove_item', {id:i});
 			}
 		}
 
@@ -264,7 +268,7 @@ window.addEventListener("load", function() {
 			world.player.placeBombActive = true;
 		}
 		if (controller.enabled) {
-			world.player.move(5 * controller.mod,engine.time_delta,controller.angle)
+			world.player.move(world.player.speed * controller.mod,engine.time_delta,controller.angle)
 			world.update();
 			socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
 		}
@@ -288,6 +292,8 @@ window.addEventListener("load", function() {
 				} else if (world.player.power == 4) {
 					display.drawImage(c4.canvas,item.x * world.tile_size + 14, item.y * world.tile_size + 14);
 				}
+			} else if (item.type == 2) {
+				display.drawImage(speed.canvas,item.x * world.tile_size, item.y * world.tile_size);
 			}
 		}
 
@@ -329,7 +335,7 @@ window.addEventListener("load", function() {
 
 		for (let p in world.other_players) {
 			if (p != socket.id && world.other_players[p].alive) {
-				display.drawRectangle(world.other_players[p].x,world.other_players[p].y,world.player.width,world.player.height,world.player.color);
+				display.drawRectangle(world.other_players[p].x,world.other_players[p].y,world.player.width,world.player.height,"red");
 			}
 		}
 
@@ -338,7 +344,6 @@ window.addEventListener("load", function() {
 	const engine = new Engine(60,update,render);
 	socket.emit('update_movement',{x:world.player.x,y:world.player.y,alive:world.player.alive})
 	resize();
-	engine.start();
 
 	window.addEventListener("keydown", controller.update);
 	window.addEventListener("keyup", controller.update);

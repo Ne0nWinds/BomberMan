@@ -34,8 +34,8 @@ function randInt(min,max) {
 
 let itemID = 0;
 function destroyCrate(x,y) {
-	if (Math.random() < 0.04) {
-		items[itemID] = {x:x,y:y,type:1};
+	if (Math.random() < 0.08) {
+		items[itemID] = {x:x,y:y,type:randInt(1,2)};
 		itemID++;
 		io.emit('update_items', items);
 	}
